@@ -1,4 +1,4 @@
-name: Android Build (Smaller APK)
+name: Android Build (APK Only)
 
 on:
   push:
@@ -32,7 +32,7 @@ jobs:
       - name: Install Python Dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install flet  # فقط flet، لا تستخدم requirements.txt إن لم تكن ضرورية
+          pip install -r requirements.txt
 
       - name: Setup Flutter ${{ env.FLUTTER_VERSION }}
         uses: subosito/flutter-action@v2
@@ -45,19 +45,18 @@ jobs:
           distribution: 'temurin'
           java-version: '21'
 
-      - name: Build Smaller APK (arm64 only)
+      - name: Build Release APK
         run: |
           flutter config --no-analytics
           flet build apk \
-            --target-platform=android-arm64 \
+            --verbose \
             --build-number=${{ env.BUILD_NUMBER }} \
-            --build-version=${{ env.BUILD_VERSION }} \
-            --release
+            --build-version=${{ env.BUILD_VERSION }}
 
-      - name: Upload Smaller APK
+      - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: app-release-arm64.apk
+          name: app-release.apk
           path: build/apk/app-release.apk
           if-no-files-found: error
           overwrite: true
